@@ -17,7 +17,7 @@ do
 	# If more than 1 R1 in dir, (NextSeq reads), merge reads together
 
 	#R1=$(ls *R1*)
-	trimmomatic PE -basein ${R1[0]} -baseout ${R1[0]%%R1*} ILLUMINACLIP:/home/ngs1/miniconda3/share/trimmomatic-0.36-5/adapters/Kapa-PE.fa:2:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:3:15 MINLEN:36 # CHANGE PATH OBVIOUSLY
+	trimmomatic PE -basein ${R1[0]} -baseout ${R1[0]%%R1*} ILLUMINACLIP:TruSeq3-PE-2.fa:2:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:3:15 MINLEN:36 # CHANGE PATH OBVIOUSLY
 	newR1=($(find -name "*1P.fastq.gz"))
 	newR2=($(find -name "*2P.fastq.gz"))
 	#newR1=$(ls *1P.fastq.gz)
@@ -46,8 +46,9 @@ filter_bad_contigs.sh
 # Run Kraken on unfiltered to screen for contamination
 #cd Filtered
 mkdir Kraken
-export KRAKEN_DEFAULT_DB="/home/ngs1/miniconda3/share/kraken/minikraken_20171019_8GB" # CHANGE DB
-export KRAKEN_NUM_THREADS=4
+KRAKENDB="/opt/minikraken/"
+#export KRAKEN_DEFAULT_DB="/home/ngs1/miniconda3/share/kraken/minikraken_20171019_8GB" # CHANGE DB
+#export KRAKEN_NUM_THREADS=4
 #kraken --fasta-input --preload --threads 4 --output Kraken/All_contigs.kraken *.fasta #UPDATE FOR KRAKEN2
 #kraken-report Kraken/All_contigs.kraken > Kraken/All_contigs.krakenreport 
 #kraken-translate Kraken/All_contigs.kraken > Kraken/All_contigs.krakentranslate
@@ -59,9 +60,9 @@ echo "Running Kraken"
 echo ""
 cd Filtered
 mkdir Kraken
-kraken --fasta-input --preload --threads 4 --output Kraken/All_contigs.kraken *.fasta # UPDATE FOR KRAKEN2
-kraken-report Kraken/All_contigs.kraken > Kraken/All_contigs.krakenreport
-kraken-translate Kraken/All_contigs.kraken > Kraken/All_contigs.krakentranslate
+kraken2 --db "$KRAKENDB" --threads 4 --report Kraken/All_contigs.krakenreport --use-names --output Kraken/All_contigs.kraken *.fasta # UPDATE FOR KRAKEN2
+#kraken-report Kraken/All_contigs.kraken > Kraken/All_contigs.krakenreport
+#kraken-translate Kraken/All_contigs.kraken > Kraken/All_contigs.krakentranslate
 rm Kraken/All_contigs.kraken
 
 # Find PhiX contigs and exclude
@@ -103,9 +104,9 @@ done
 
 # Run Krakentranslate2R for Affyboy-style figures
 
-python /home/ngs1/.fhiscripts/Krakentranslate2R.py Kraken/All_contigs.krakentranslate Kraken/All_contigs.Rtable # CHANGE DIR
+Krakentranslate2R.py Kraken/All_contigs.krakentranslate Kraken/All_contigs.Rtable
 
-Rscript --vanilla /home/ngs1/.fhiscripts/Rscript_Kraken.R "$basedir"/"${spades_output_dir}"/Filtered/Kraken/ "$basedir"/"${spades_output_dir}"/Filtered/Kraken/All_contigs.Rtable
+Rscript --vanilla /usr/bin/fhiscripts/Rscript_Kraken.R "$basedir"/"${spades_output_dir}"/Filtered/Kraken/ "$basedir"/"${spades_output_dir}"/Filtered/Kraken/All_contigs.Rtable
 	
 # REMOVE ALL UNNECESSARY FILES
 
