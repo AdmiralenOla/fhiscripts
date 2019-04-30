@@ -17,7 +17,7 @@ do
 	# If more than 1 R1 in dir, (NextSeq reads), merge reads together
 
 	#R1=$(ls *R1*)
-	trimmomatic PE -basein ${R1[0]} -baseout ${R1[0]%%R1*} ILLUMINACLIP:TruSeq3-PE-2.fa:2:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:3:15 MINLEN:36 # CHANGE PATH OBVIOUSLY
+	trimmomatic PE -basein ${R1[0]} -baseout ${R1[0]%%R1*}.fastq.gz ILLUMINACLIP:/opt/conda/share/trimmomatic/adapters/TruSeq3-PE-2.fa:2:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:3:15 MINLEN:36
 	newR1=($(find -name "*1P.fastq.gz"))
 	newR2=($(find -name "*2P.fastq.gz"))
 	#newR1=$(ls *1P.fastq.gz)
@@ -27,8 +27,8 @@ do
 done
 
 # Copy all contig files to new directory and name appropriately
-spades_output_dir="./${runname}_spades_assembly"
-mkdir "./${runname}_spades_assembly"
+spades_output_dir="./Spades_assembly"
+mkdir "./Spades_assembly"
 for dir in $(ls -d */)
 do
 	#cp ${dir}Data/Intensities/BaseCalls/contigs.fasta ./Spades_assembly/${dir%-????????/}.fasta
@@ -46,7 +46,7 @@ filter_bad_contigs.sh
 # Run Kraken on unfiltered to screen for contamination
 #cd Filtered
 mkdir Kraken
-KRAKENDB="/opt/minikraken/"
+KRAKENDB="/opt/minikraken/minikraken"
 #export KRAKEN_DEFAULT_DB="/home/ngs1/miniconda3/share/kraken/minikraken_20171019_8GB" # CHANGE DB
 #export KRAKEN_NUM_THREADS=4
 #kraken --fasta-input --preload --threads 4 --output Kraken/All_contigs.kraken *.fasta #UPDATE FOR KRAKEN2
