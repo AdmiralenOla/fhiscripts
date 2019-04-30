@@ -17,7 +17,7 @@ do
 	# If more than 1 R1 in dir, (NextSeq reads), merge reads together
 
 	#R1=$(ls *R1*)
-	trimmomatic PE -basein ${R1[0]} -baseout ${R1[0]%%R1*}.fastq.gz ILLUMINACLIP:/opt/conda/share/trimmomatic/adapters/TruSeq3-PE-2.fa:2:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:3:15 MINLEN:36
+	trimmomatic PE -basein ${R1[0]} -baseout ${R1[0]%%_R1*}.fastq.gz ILLUMINACLIP:/opt/conda/share/trimmomatic/adapters/TruSeq3-PE-2.fa:2:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:3:15 MINLEN:36
 	newR1=($(find -name "*1P.fastq.gz"))
 	newR2=($(find -name "*2P.fastq.gz"))
 	#newR1=$(ls *1P.fastq.gz)
