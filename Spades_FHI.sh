@@ -46,7 +46,7 @@ done
 cd ${basedir}
 
 # Copy all contig files to new directory and name appropriately
-spades_output_dir="./Spades_assembly"
+spades_output_dir="${basedir}/Spades_assembly"
 if ! test -f "Spades_assembly"; then
 	mkdir "./Spades_assembly"	
 fi
