@@ -119,11 +119,11 @@ read yesnodel
 
 
 if [ "$yesnodel" == "y" ]; then
-	for x in $(ls -d */)
-	do
-		rm -rf ${x}Output
-		rm ${x}*trim_??.fastq.gz
-	done
+	rm -rf */Output
+	rm */*1P.fastq.gz
+	rm */*1U.fastq.gz
+	rm */*2P.fastq.gz
+	rm */*2U.fastq.gz
 else
 	echo "Exiting without removing intermediary files"
 	exit
