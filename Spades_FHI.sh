@@ -17,7 +17,7 @@ do
 	R1=($(find -name "*R1*"))
 	# If more than 1 R1 in dir, (NextSeq reads), merge reads together
 	if [ ${#R1[@]} > 1 ]; then		
-		Rlen=${#R1[@]1}
+		Rlen=${#R1[@]}
 		for (( i=0; i<${Rlen}; i++ ));
 		do
 			cat ${R1[$i]} >> ${strain}_merged_R1.fastq.gz
@@ -50,7 +50,9 @@ for dir in $(ls -d */)
 do
 	#cp ${dir}Data/Intensities/BaseCalls/contigs.fasta ./Spades_assembly/${dir%-????????/}.fasta
 	# IF FILES DONT HAVE THE SILLY -????? etc suffix:
-	cp ${dir}Output/contigs.fasta "${spades_output_dir}/${dir%/}.fasta"
+	if test -f ${dir}Output/contigs.fasta; then
+		cp ${dir}Output/contigs.fasta "${spades_output_dir}/${dir%/}.fasta"
+	fi
 done
 
 # Run filtration
