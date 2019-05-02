@@ -65,7 +65,7 @@ echo ""
 echo "Filtering bad contigs"
 echo ""
 cd "${spades_output_dir}"
-filter_bad_contigs.sh -d ${spades_output_dir}
+filter_bad_contigs.sh -d="${spades_output_dir}/"
 
 # Run Kraken on unfiltered to screen for contamination
 #cd Filtered

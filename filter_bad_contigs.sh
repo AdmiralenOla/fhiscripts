@@ -49,7 +49,10 @@ fi
 
 # SEND FILE NOT DIRECTORY
 all=$(ls ${DIRECTORY}*.fasta)
-mkdir $DIRECTORY\Filtered
+if ! test -f $DIRECTORY\Filtered; then
+	mkdir $DIRECTORY\Filtered
+fi
+
 for x in $all
 do
 	filter_contigs.py -l $LENGTH -f $x -c $COVERAGE

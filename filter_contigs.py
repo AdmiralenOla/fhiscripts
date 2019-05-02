@@ -10,7 +10,7 @@ try:
     if len(args) > 0:
         raise getopt.GetoptError("Please ensure that you have entered command correctly",None)
 except getopt.GetoptError:
-    print "Usage: python filter_contigs.py -l min_contig_length -f file_to_filter -c minimum_coverage"
+    print("Usage: python filter_contigs.py -l min_contig_length -f file_to_filter -c minimum_coverage")
     sys.exit(2)
     
 for opt, arg in opts:
@@ -21,7 +21,7 @@ for opt, arg in opts:
     elif opt in ("-c"):
         mincoverage = arg
     else:
-        print "Unrecognized option: " + opt
+        print("Unrecognized option: " + opt)
 
 
 #min_length, fasta_file_path = sys.argv[1:]

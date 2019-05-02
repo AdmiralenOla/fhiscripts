@@ -10,7 +10,7 @@ try:
     if len(args) > 0:
         raise getopt.GetoptError("Please ensure that you have entered command correctly",None)
 except getopt.GetoptError:
-    print "Usage: python filter_coverage.py -l min_contig_length -f file_to_filter -c minimum_coverage"
+    print("Usage: python filter_coverage.py -l min_contig_length -f file_to_filter -c minimum_coverage")
     sys.exit(2)
 for opt, arg in opts:
     if opt in ("-l"):
@@ -20,7 +20,7 @@ for opt, arg in opts:
     elif opt in ("-c"):
         min_coverage = float(arg)
     else:
-        print "Unrecognized option: " + opt
+        print("Unrecognized option: " + opt)
 
 
 #cov_pattern = re.compile("cov_([0-9.]+)$")
