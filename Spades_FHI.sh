@@ -36,7 +36,7 @@ do
 	newR1=($(find -name "*1P.fastq.gz"))
 	newR2=($(find -name "*2P.fastq.gz"))
 
-	if ! [ -f Output ] || [ -f ${basedir}/Spades_assembly/${strain} ]; then
+	if ! [ -f Output ] || [ -f ${basedir}/Spades_assembly/${strain}.fasta ]; then
 		spades.py -o Output --careful --cov-cutoff auto -t 4 -1 ${newR1[0]} -2 ${newR2[0]}
 	fi
 
