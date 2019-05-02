@@ -43,9 +43,14 @@ do
 	cd "${basedir}"
 done
 
+cd ${basedir}
+
 # Copy all contig files to new directory and name appropriately
 spades_output_dir="./Spades_assembly"
-mkdir "./Spades_assembly"
+if ! test -f "Spades_assembly"; then
+	mkdir "./Spades_assembly"	
+fi
+
 for dir in $(ls -d */)
 do
 	#cp ${dir}Data/Intensities/BaseCalls/contigs.fasta ./Spades_assembly/${dir%-????????/}.fasta
@@ -60,7 +65,7 @@ echo ""
 echo "Filtering bad contigs"
 echo ""
 cd "${spades_output_dir}"
-filter_bad_contigs.sh
+filter_bad_contigs.sh -d ${spades_output_dir}
 
 # Run Kraken on unfiltered to screen for contamination
 #cd Filtered
