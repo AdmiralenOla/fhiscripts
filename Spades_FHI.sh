@@ -16,7 +16,7 @@ do
 	# Find R1 and R2, get results into an array
 	R1=($(find -name "*R1*"))
 	# If more than 1 R1 in dir, (NextSeq reads), merge reads together
-	if [ ${#R1[@]} > 1 ]; then		
+	if [ ${#R1[@]} -gt 1 ]; then		
 		Rlen=${#R1[@]}
 		for (( i=0; i<${Rlen}; i++ ));
 		do
@@ -29,7 +29,7 @@ do
 	#R1=$(ls *R1*)
 	#NOTE - If trimmed results already exist - Don't do trimmomatic
 	check=($(find -name "*1P.fastq.gz"))
-	if ! [ ${#test[@]} > 0 ]; then
+	if ! [ ${#check[@]} -gt 0 ]; then
 		trimmomatic PE -basein ${R1[0]} -baseout ${R1[0]%%_R1*}.fastq.gz ILLUMINACLIP:/opt/conda/share/trimmomatic/adapters/TruSeq3-PE-2.fa:2:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:3:15 MINLEN:36
 	fi
 
