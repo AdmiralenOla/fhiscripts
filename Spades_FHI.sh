@@ -142,7 +142,7 @@ done
 
 Krakentranslate2R.py Kraken/All_contigs.krakentranslate Kraken/All_contigs.Rtable
 
-Rscript --vanilla /usr/bin/fhiscripts/Rscript_Kraken.R "$basedir"/"${spades_output_dir}"/Filtered/Kraken/ "$basedir"/"${spades_output_dir}"/Filtered/Kraken/All_contigs.Rtable
+Rscript --vanilla /usr/bin/Rscript_Kraken.R "$basedir"/"${spades_output_dir}"/Filtered/Kraken/ "$basedir"/"${spades_output_dir}"/Filtered/Kraken/All_contigs.Rtable
 	
 # REMOVE ALL UNNECESSARY FILES
 
