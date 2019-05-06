@@ -12,7 +12,7 @@ runname=${basedir##*/}
 for dir in $(ls -d */)
 do
 	# Skip dir if name equal to Spades_assembly
-	[ $dir = "Spades_assembly/" && continue ]
+	[ $dir = "Spades_assembly/" ] && continue
 	# Enter dir
 	cd ${dir}
 	# Get strain name
