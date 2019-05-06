@@ -76,7 +76,9 @@ filter_bad_contigs.sh
 
 # Run Kraken on unfiltered to screen for contamination
 #cd Filtered
-mkdir Kraken
+if ! test -d "Kraken"; then
+	mkdir Kraken
+fi
 KRAKENDB="/opt/minikraken/minikraken"
 #export KRAKEN_DEFAULT_DB="/home/ngs1/miniconda3/share/kraken/minikraken_20171019_8GB" # CHANGE DB
 #export KRAKEN_NUM_THREADS=4
@@ -91,7 +93,10 @@ echo "Running Kraken"
 echo ""
 cd Filtered
 mkdir Kraken
-kraken --db "$KRAKENDB" --threads 4 --fasta-input --output Kraken/All_contigs.kraken --preload
+if ! test -d "Kraken"; then
+	mkdir "Kraken"
+fi
+kraken --db "$KRAKENDB" --threads 4 --fasta-input --output Kraken/All_contigs.kraken --preload *.fasta
 #kraken2 --db "$KRAKENDB" --threads 4 --report Kraken/All_contigs.krakenreport --use-names --output Kraken/All_contigs.kraken *.fasta # MOVE BACK TO KRAKEN1
 kraken-report Kraken/All_contigs.kraken > Kraken/All_contigs.krakenreport
 kraken-translate Kraken/All_contigs.kraken > Kraken/All_contigs.krakentranslate
