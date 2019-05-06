@@ -30,7 +30,7 @@ cov_pattern = re.compile("cov_([0-9.]+)")
 #min_coverage, fasta_file_path = sys.argv[1:]
 #with open(contigfile.replace('fasta', 'filter{}cov.fasta'.format(min_coverage)), 'rUw') as filtered_fasta:
 with open(contigfile.replace('.fasta', '_fullyfiltered.fasta'), 'w') as write_fasta:
-    with open(contigfile.replace('.fasta', '_filtered.fasta'), 'rU') as filtered_fasta:
+    with open(contigfile.replace('.fasta', '_filtered.fasta'), 'r') as filtered_fasta:
     
 
 
