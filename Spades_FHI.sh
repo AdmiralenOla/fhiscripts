@@ -92,7 +92,6 @@ echo ""
 echo "Running Kraken"
 echo ""
 cd Filtered
-mkdir Kraken
 if ! test -d "Kraken"; then
 	mkdir "Kraken"
 fi
