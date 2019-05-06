@@ -82,10 +82,10 @@ fi
 KRAKENDB="/opt/minikraken/minikraken"
 #export KRAKEN_DEFAULT_DB="/home/ngs1/miniconda3/share/kraken/minikraken_20171019_8GB" # CHANGE DB
 #export KRAKEN_NUM_THREADS=4
-#kraken --fasta-input --preload --threads 4 --output Kraken/All_contigs.kraken *.fasta #UPDATE FOR KRAKEN2
-#kraken-report Kraken/All_contigs.kraken > Kraken/All_contigs.krakenreport 
-#kraken-translate Kraken/All_contigs.kraken > Kraken/All_contigs.krakentranslate
-#rm Kraken/All_contigs.kraken
+kraken --db "$KRAKENDB" --fasta-input --preload --threads 4 --output Kraken/All_contigs.kraken *.fasta #UPDATE FOR KRAKEN2
+kraken-report --db "$KRAKENDB" Kraken/All_contigs.kraken > Kraken/All_contigs.krakenreport 
+kraken-translate --db "$KRAKENDB" Kraken/All_contigs.kraken > Kraken/All_contigs.krakentranslate
+rm Kraken/All_contigs.kraken
 
 # Re-run Kraken on filtered to make sure contigs are good
 echo ""
@@ -142,7 +142,7 @@ done
 
 Krakentranslate2R.py Kraken/All_contigs.krakentranslate Kraken/All_contigs.Rtable
 
-Rscript --vanilla /usr/bin/Rscript_Kraken.R "$basedir"/"${spades_output_dir}"/Filtered/Kraken/ "$basedir"/"${spades_output_dir}"/Filtered/Kraken/All_contigs.Rtable
+Rscript --vanilla /usr/bin/Rscript_Kraken.R "${spades_output_dir}"/Filtered/Kraken/ "${spades_output_dir}"/Filtered/Kraken/All_contigs.Rtable
 	
 # REMOVE ALL UNNECESSARY FILES
 
