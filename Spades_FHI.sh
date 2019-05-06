@@ -98,8 +98,8 @@ if ! test -d "Kraken"; then
 fi
 kraken --db "$KRAKENDB" --threads 4 --fasta-input --output Kraken/All_contigs.kraken --preload *.fasta
 #kraken2 --db "$KRAKENDB" --threads 4 --report Kraken/All_contigs.krakenreport --use-names --output Kraken/All_contigs.kraken *.fasta # MOVE BACK TO KRAKEN1
-kraken-report Kraken/All_contigs.kraken > Kraken/All_contigs.krakenreport
-kraken-translate Kraken/All_contigs.kraken > Kraken/All_contigs.krakentranslate
+kraken-report --db "$KRAKENDB" Kraken/All_contigs.kraken > Kraken/All_contigs.krakenreport
+kraken-translate --db "$KRAKENDB" Kraken/All_contigs.kraken > Kraken/All_contigs.krakentranslate
 rm Kraken/All_contigs.kraken
 
 # Find PhiX contigs and exclude
