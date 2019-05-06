@@ -27,10 +27,10 @@ def main():
     # Create FASTA output file.
     if args.output:
         rename = False
-        fasta_out = open(args.output, 'wb')
+        fasta_out = open(args.output, 'w')
     else:
         rename = True
-        fasta_out = open(args.input + "_out", "wb")
+        fasta_out = open(args.input + "_out", "w")
 
     # Start counter.
     #count = 1
