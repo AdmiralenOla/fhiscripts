@@ -11,7 +11,11 @@ runname=${basedir##*/}
 
 for dir in $(ls -d */)
 do
+	# Skip dir if name equal to Spades_assembly
+	[ $dir = "Spades_assembly/" && continue ]
+	# Enter dir
 	cd ${dir}
+	# Get strain name
 	strain=${PWD##*/}
 	# Find R1 and R2, get results into an array
 	R1=($(find -name "*R1*"))
@@ -23,6 +27,7 @@ do
 			cat ${R1[$i]} >> ${strain}_merged_R1.fastq.gz
 			cat ${R1[$i]/R1/R2} >> ${strain}_merged_R2.fastq.gz
 		done
+		# Set R1 to be the merged file
 		R1=($(find -name "*merged_R1.fastq.gz"))
 	fi
 
@@ -33,9 +38,11 @@ do
 		trimmomatic PE -basein ${R1[0]} -baseout ${R1[0]%%_R1*}.fastq.gz ILLUMINACLIP:/opt/conda/share/trimmomatic/adapters/TruSeq3-PE-2.fa:2:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:3:15 MINLEN:36
 	fi
 
+	# newR1/R2 should be the trimmed files
 	newR1=($(find -name "*1P.fastq.gz"))
 	newR2=($(find -name "*2P.fastq.gz"))
 
+	# Run spades unless fasta file already exists in Spades_assembly OR dir Output exists in current folder
 	if ! ( [ -f Output ] || [ -f ${basedir}/Spades_assembly/${strain}.fasta ] ); then
 		spades.py -o Output --careful --cov-cutoff auto -t 4 -1 ${newR1[0]} -2 ${newR2[0]}
 	fi
@@ -47,7 +54,7 @@ cd ${basedir}
 
 # Copy all contig files to new directory and name appropriately
 spades_output_dir="${basedir}/Spades_assembly"
-if ! test -f "Spades_assembly"; then
+if ! test -d "Spades_assembly"; then
 	mkdir "./Spades_assembly"	
 fi
 
@@ -65,7 +72,7 @@ echo ""
 echo "Filtering bad contigs"
 echo ""
 cd "${spades_output_dir}"
-filter_bad_contigs.sh -d="${spades_output_dir}/"
+filter_bad_contigs.sh
 
 # Run Kraken on unfiltered to screen for contamination
 #cd Filtered
@@ -84,9 +91,10 @@ echo "Running Kraken"
 echo ""
 cd Filtered
 mkdir Kraken
-kraken2 --db "$KRAKENDB" --threads 4 --report Kraken/All_contigs.krakenreport --use-names --output Kraken/All_contigs.kraken *.fasta # UPDATE FOR KRAKEN2
-#kraken-report Kraken/All_contigs.kraken > Kraken/All_contigs.krakenreport
-#kraken-translate Kraken/All_contigs.kraken > Kraken/All_contigs.krakentranslate
+kraken --db "$KRAKENDB" --threads 4 --fasta-input --output Kraken/All_contigs.kraken --preload
+#kraken2 --db "$KRAKENDB" --threads 4 --report Kraken/All_contigs.krakenreport --use-names --output Kraken/All_contigs.kraken *.fasta # MOVE BACK TO KRAKEN1
+kraken-report Kraken/All_contigs.kraken > Kraken/All_contigs.krakenreport
+kraken-translate Kraken/All_contigs.kraken > Kraken/All_contigs.krakentranslate
 rm Kraken/All_contigs.kraken
 
 # Find PhiX contigs and exclude

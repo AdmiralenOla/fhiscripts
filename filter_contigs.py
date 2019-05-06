@@ -27,7 +27,7 @@ for opt, arg in opts:
 #min_length, fasta_file_path = sys.argv[1:]
 #with open(contigfile.replace('fasta', 'filter{}.fasta'.format(min_length)), 'w') as filtered_fasta:
 with open(contigfile.replace('.fasta', '_filtered.fasta'), 'w') as filtered_fasta:
-    with open(contigfile, 'rU') as input_fasta:
+    with open(contigfile, 'r') as input_fasta:
         def filtered_contigs_generator(min):
             for contig in SeqIO.parse(input_fasta, 'fasta'):
                 if len(contig) >= min:

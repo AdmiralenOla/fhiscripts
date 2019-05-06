@@ -49,7 +49,7 @@ fi
 
 # SEND FILE NOT DIRECTORY
 all=$(ls ${DIRECTORY}*.fasta)
-if ! test -f $DIRECTORY\Filtered; then
+if ! test -d $DIRECTORY\Filtered; then
 	mkdir $DIRECTORY\Filtered
 fi
 
