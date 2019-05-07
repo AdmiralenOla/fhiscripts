@@ -18,7 +18,7 @@ do
 	# Get strain name
 	strain=${PWD##*/}
 	# Find R1 and R2, get results into an array
-	R1=($(find -name "*R1*"))
+	R1=($(find -name "*R1*" | sort ))
 	# If more than 1 R1 in dir, (NextSeq reads), merge reads together
 	if [ ${#R1[@]} -gt 1 ]; then		
 		Rlen=${#R1[@]}
