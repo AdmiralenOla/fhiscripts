@@ -95,15 +95,18 @@ kraken-report --db "$KRAKENDB" Kraken/All_contigs.kraken > Kraken/All_contigs.kr
 kraken-translate --db "$KRAKENDB" Kraken/All_contigs.kraken > Kraken/All_contigs.krakentranslate
 rm Kraken/All_contigs.kraken
 
+# Find PhiX contigs and exclude
+# Note that this needs to operate on UNFILTERED contigs
+
+readarray phiX < <(grep "phiX" Kraken/All_contigs.krakentranslate)
+# Can change into filtered dir after finding which contigs are phiX
 cd Filtered
 
-# Find PhiX contigs and exclude
+
 # < <( does process substitution
 echo ""
 echo "Removing phiX contigs from filtered contigs"
 echo ""
-
-readarray phiX < <(grep "phiX" Kraken/All_contigs.krakentranslate)
 
 # Create method to find substring index
 # Returns -1 if not found. Returns index (0-based) if substring b found in a
