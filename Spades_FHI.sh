@@ -77,6 +77,11 @@ echo ""
 cd "${spades_output_dir}"
 filter_bad_contigs.sh
 
+# Re-run Kraken on filtered to make sure contigs are good
+echo ""
+echo "Running Kraken on unfiltered contigs"
+echo ""
+
 # Run Kraken on unfiltered to screen for contamination
 #cd Filtered
 if ! test -d "Kraken"; then
@@ -90,24 +95,12 @@ kraken-report --db "$KRAKENDB" Kraken/All_contigs.kraken > Kraken/All_contigs.kr
 kraken-translate --db "$KRAKENDB" Kraken/All_contigs.kraken > Kraken/All_contigs.krakentranslate
 rm Kraken/All_contigs.kraken
 
-# Re-run Kraken on filtered to make sure contigs are good
-echo ""
-echo "Running Kraken"
-echo ""
 cd Filtered
-if ! test -d "Kraken"; then
-	mkdir "Kraken"
-fi
-kraken --db "$KRAKENDB" --threads 4 --fasta-input --output Kraken/All_contigs.kraken --preload *.fasta
-#kraken2 --db "$KRAKENDB" --threads 4 --report Kraken/All_contigs.krakenreport --use-names --output Kraken/All_contigs.kraken *.fasta # MOVE BACK TO KRAKEN1
-kraken-report --db "$KRAKENDB" Kraken/All_contigs.kraken > Kraken/All_contigs.krakenreport
-kraken-translate --db "$KRAKENDB" Kraken/All_contigs.kraken > Kraken/All_contigs.krakentranslate
-rm Kraken/All_contigs.kraken
 
 # Find PhiX contigs and exclude
 # < <( does process substitution
 echo ""
-echo "Removing phiX contigs"
+echo "Removing phiX contigs from filtered contigs"
 echo ""
 
 readarray phiX < <(grep "phiX" Kraken/All_contigs.krakentranslate)
@@ -140,6 +133,20 @@ do
 	perl -ne 'if(/^>(\S+)/){$c=grep{/^$1$/} $ENV{contigname} }print if not $c' $filename > ${filename}_nophix
 	mv ${filename}_nophix ${filename}
 done
+
+# Re-run Kraken on filtered to make sure contigs are good
+echo ""
+echo "Running Kraken on filtered contigs"
+echo ""
+if ! test -d "Kraken"; then
+	mkdir "Kraken"
+fi
+kraken --db "$KRAKENDB" --threads 4 --fasta-input --output Kraken/All_contigs.kraken --preload *.fasta
+#kraken2 --db "$KRAKENDB" --threads 4 --report Kraken/All_contigs.krakenreport --use-names --output Kraken/All_contigs.kraken *.fasta # MOVE BACK TO KRAKEN1
+kraken-report --db "$KRAKENDB" Kraken/All_contigs.kraken > Kraken/All_contigs.krakenreport
+kraken-translate --db "$KRAKENDB" Kraken/All_contigs.kraken > Kraken/All_contigs.krakentranslate
+rm Kraken/All_contigs.kraken
+
 
 # Run Krakentranslate2R for Affyboy-style figures
 
