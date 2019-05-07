@@ -24,11 +24,11 @@ do
 		Rlen=${#R1[@]}
 		for (( i=0; i<${Rlen}; i++ ));
 		do
-			cat ${R1[$i]} >> ${strain}_merged_R1.fastq.gz
-			cat ${R1[$i]/R1/R2} >> ${strain}_merged_R2.fastq.gz
+			cat ${R1[$i]} >> ${strain}_merged_R1_001.fastq.gz
+			cat ${R1[$i]/R1/R2} >> ${strain}_merged_R2_001.fastq.gz
 		done
 		# Set R1 to be the merged file
-		R1=($(find -name "*merged_R1.fastq.gz"))
+		R1=($(find -name "*merged_R1_001.fastq.gz"))
 	fi
 
 	#R1=$(ls *R1*)
