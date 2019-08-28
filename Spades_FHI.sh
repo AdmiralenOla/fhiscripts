@@ -4,7 +4,7 @@
 
 # USAGE: Trim_and_assemble.sh
 
-VERSION="1.0"
+VERSION="1.1"
 
 basedir=$(pwd)
 runname=${basedir##*/}
@@ -157,6 +157,10 @@ Krakentranslate2R.py Kraken/All_contigs.krakentranslate Kraken/All_contigs.Rtabl
 
 Rscript --vanilla /usr/bin/Rscript_Kraken.R "${spades_output_dir}"/Filtered/Kraken/ "${spades_output_dir}"/Filtered/Kraken/All_contigs.Rtable
 	
+# TAG WITH VERSION AND DATE
+echo "VERSION=${VERSION}" >> "${spades_output_dir}/Spades_FHI_RUNINFO.txt"
+echo "DATE=$(date)" >> "${spades_output_dir}/Spades_FHI_RUNINFO.txt"
+
 # REMOVE ALL UNNECESSARY FILES
 
 cd "$basedir"
