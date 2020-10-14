@@ -21,6 +21,20 @@ function usage {
 	exit 1
 }
 
+function stats {
+	awk '/^>/ { seqtotal+=seqlen
+            seqlen=0
+            seq+=1
+            next
+            }
+    {
+    seqlen += length($0)
+    }     
+    END{
+        print "Contigs: " seq " Length: " seqtotal+seqlen
+    }' $1
+}
+
 while getopts c:f:r: option
 do
 	case "${option}"
@@ -49,6 +63,9 @@ if ! test -f $REV; then
 fi
 
 COV=$(coverm genome -1 $FWD -2 $REV -r $REF -t 4 --single-genome -m mean -q)
-echo $COV | cut -d " " -f 5
+
+STATS=$(stats ${REF})
+
+echo $STATS $COV | cut -d " " -f 2,4,9
 
 conda deactivate
