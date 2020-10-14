@@ -4,10 +4,13 @@
 
 # USAGE: Trim_and_assemble.sh
 
-VERSION="1.1"
+VERSION="1.2"
 
 basedir=$(pwd)
 runname=${basedir##*/}
+
+# Version 1.2 - Array to hold overview of files for each strain
+declare -A my_array
 
 for dir in $(ls -d */)
 do
@@ -41,9 +44,13 @@ do
 		trimmomatic PE -basein ${R1[0]} -baseout ${R1[0]%%_R1_001.fastq.gz}.fastq.gz ILLUMINACLIP:/opt/conda/share/trimmomatic/adapters/TruSeq3-PE-2.fa:2:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:3:15 MINLEN:36
 	fi
 
-	# newR1/R2 should be the trimmed files
+	# newR1/R2 should be the trimmed files - Note these paths are relative to the 
 	newR1=($(find -name "*1P.fastq.gz"))
 	newR2=($(find -name "*2P.fastq.gz"))
+
+	# Add to my_array
+	my_array["${strain}_R1"]="${basedir}/${dir}${newR1}"
+	my_array["${strain}_R2"]="${basedir}/${dir}${newR2}"
 
 	# Run spades unless fasta file already exists in Spades_assembly OR dir Output exists in current folder
 	if ! ( [ -f Output ] || [ -f ${basedir}/Spades_assembly/${strain}.fasta ] ); then
@@ -156,6 +163,15 @@ rm Kraken/All_contigs.kraken
 Krakentranslate2R.py Kraken/All_contigs.krakentranslate Kraken/All_contigs.Rtable
 
 Rscript --vanilla /usr/bin/Rscript_Kraken.R "${spades_output_dir}"/Filtered/Kraken/ "${spades_output_dir}"/Filtered/Kraken/All_contigs.Rtable
+
+# Version 1.2 - DIAGNOSTICS PER STRAIN
+echo "Strain Ncontigs Length Coverage" >> "${spades_output_dir}/Spades_FHI_RUNDIAGNOSTICS.txt"
+for output in *.fasta
+do
+	strainname=${output%.fasta}
+	this_R1="${my_array[${strainname}_R1]}"
+	this_R2="${my_array[${strainname}_R2]}"
+	echo "${strainname} $(coverage_calculator.sh -c ${output} -f ${this_R1} -r ${this_R2})" >> "${spades_output_dir}/Spades_FHI_RUNDIAGNOSTICS.txt"
 	
 # TAG WITH VERSION AND DATE
 echo "VERSION=${VERSION}" >> "${spades_output_dir}/Spades_FHI_RUNINFO.txt"
