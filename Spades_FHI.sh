@@ -8,6 +8,7 @@ VERSION="1.2"
 
 basedir=$(pwd)
 runname=${basedir##*/}
+KRAKENDB="/opt/minikraken/minikraken"
 
 # Version 1.2 - Array to hold overview of files for each strain
 declare -A my_array
@@ -57,6 +58,14 @@ do
 	# Run FASTQC
 	fastqc.sh -f $newR1 -r $newR2
 
+	# Run kraken on samples
+	if ! test -f ${strain}.kraken; then
+		kraken --db "$KRAKENDB" --threads 4 --fastq-input --gzip-compressed --paired --output ${strain}.kraken --preload $newR1 $newR2
+	fi
+	# Kraken-report
+	if ! test -f ${strain}.strainreport; then
+		kraken-report --db "$KRAKENDB" ${strain}.kraken > ${strain}.strainreport
+	fi
 	# Run spades unless fasta file already exists in Spades_assembly OR dir Output exists in current folder
 	if ! ( [ -f Output ] || [ -f ${basedir}/Spades_assembly/${strain}.fasta ] ); then
 		spades.py -o Output --careful --cov-cutoff auto -t 4 -1 ${newR1[0]} -2 ${newR2[0]}
@@ -99,7 +108,6 @@ echo ""
 if ! test -d "Kraken"; then
 	mkdir Kraken
 fi
-KRAKENDB="/opt/minikraken/minikraken"
 #export KRAKEN_DEFAULT_DB="/home/ngs1/miniconda3/share/kraken/minikraken_20171019_8GB" # CHANGE DB
 #export KRAKEN_NUM_THREADS=4
 kraken --db "$KRAKENDB" --fasta-input --preload --threads 4 --output Kraken/All_contigs.kraken *.fasta #UPDATE FOR KRAKEN2
