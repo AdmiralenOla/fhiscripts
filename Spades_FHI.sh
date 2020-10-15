@@ -44,6 +44,7 @@ do
 	#NOTE - If trimmed results already exist - Don't do trimmomatic
 	check=($(find -name "*1P.fastq.gz"))
 	if ! [ ${#check[@]} -gt 0 ]; then
+		echo "Trimming strain ${strain}"
 		trimmomatic PE -basein ${R1[0]} -baseout ${R1[0]%%_R1_001.fastq.gz}.fastq.gz ILLUMINACLIP:/opt/conda/share/trimmomatic/adapters/TruSeq3-PE-2.fa:2:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:3:15 MINLEN:36
 	fi
 
@@ -59,6 +60,7 @@ do
 	fastqc.sh -f $newR1 -r $newR2
 
 	# Run kraken on samples
+	echo "Running Kraken on strain ${strain}"
 	if ! test -f ${strain}.kraken; then
 		kraken --db "$KRAKENDB" --threads 4 --fastq-input --gzip-compressed --paired --output ${strain}.kraken --preload $newR1 $newR2
 	fi
@@ -67,6 +69,7 @@ do
 		kraken-report --db "$KRAKENDB" ${strain}.kraken > ${strain}.strainreport
 	fi
 	# Run spades unless fasta file already exists in Spades_assembly OR dir Output exists in current folder
+	echo "Running Spades on strain ${strain}"
 	if ! ( [ -f Output ] || [ -f ${basedir}/Spades_assembly/${strain}.fasta ] ); then
 		spades.py -o Output --careful --cov-cutoff auto -t 4 -1 ${newR1[0]} -2 ${newR2[0]}
 	fi
@@ -219,6 +222,7 @@ if [ "$yesnodel" == "y" ]; then
 	rm */*1U.fastq.gz
 	rm */*2P.fastq.gz
 	rm */*2U.fastq.gz
+	rm */*.kraken
 else
 	echo "Exiting without removing intermediary files"
 	exit
