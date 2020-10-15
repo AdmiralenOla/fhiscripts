@@ -5,6 +5,6 @@
 eval "$(conda shell.bash hook)"
 conda activate qc
 
-multiqc .
+multiqc --ignore *krakenreport .
 
 conda deactivate
