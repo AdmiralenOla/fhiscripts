@@ -16,6 +16,8 @@ for dir in $(ls -d */)
 do
 	# Skip dir if name equal to Spades_assembly
 	[ $dir = "Spades_assembly/" ] && continue
+	# Skip dir if name equal to QC
+	[ $dir = "QC/" ] && continue
 	# Enter dir
 	cd ${dir}
 	# Get strain name
@@ -51,6 +53,9 @@ do
 	# Add to my_array
 	my_array["${strain}_R1"]="${basedir}/${dir}${newR1}"
 	my_array["${strain}_R2"]="${basedir}/${dir}${newR2}"
+
+	# Run FASTQC
+	fastqc.sh -f $newR1 -r $newR2
 
 	# Run spades unless fasta file already exists in Spades_assembly OR dir Output exists in current folder
 	if ! ( [ -f Output ] || [ -f ${basedir}/Spades_assembly/${strain}.fasta ] ); then
@@ -165,21 +170,34 @@ Krakentranslate2R.py Kraken/All_contigs.krakentranslate Kraken/All_contigs.Rtabl
 Rscript --vanilla /usr/bin/Rscript_Kraken.R "${spades_output_dir}"/Filtered/Kraken/ "${spades_output_dir}"/Filtered/Kraken/All_contigs.Rtable
 
 # Version 1.2 - DIAGNOSTICS PER STRAIN
+echo "Creating run diagnostics per genome"
 echo "Strain Ncontigs Length Coverage" >> "${spades_output_dir}/Spades_FHI_RUNDIAGNOSTICS.txt"
 for output in *.fasta
 do
 	strainname=${output%.fasta}
 	this_R1="${my_array[${strainname}_R1]}"
 	this_R2="${my_array[${strainname}_R2]}"
+	echo "Calculating coverage of strain ${strainname}, fastafile ${output}, R1 ${this_R1}, R2 ${this_R2}"
 	echo "${strainname} $(coverage_calculator.sh -c ${output} -f ${this_R1} -r ${this_R2})" >> "${spades_output_dir}/Spades_FHI_RUNDIAGNOSTICS.txt"
-	
+done
+
+
 # TAG WITH VERSION AND DATE
 echo "VERSION=${VERSION}" >> "${spades_output_dir}/Spades_FHI_RUNINFO.txt"
 echo "DATE=$(date)" >> "${spades_output_dir}/Spades_FHI_RUNINFO.txt"
 
+# Run multiqc
+cd "$basedir"
+all_strains=$(ls -d */)
+delete=("Spades_assembly/" "QC/")
+for del in ${delete[@]}
+do
+	all_strains="${all_strains[@]/$del}"
+done
+multiqc.sh 
+
 # REMOVE ALL UNNECESSARY FILES
 
-cd "$basedir"
 
 echo "You are now in $(pwd). Remove all temporary non-result files (e.g. spades intermediary files)?"
 echo "[y]es / [n]o"
