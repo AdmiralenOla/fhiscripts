@@ -38,10 +38,6 @@ do
 		R2=($(find -name "*2P.fastq.gz"))
 	fi
 
-	# Add to my_array
-	my_array["${strain}_R1"]="${basedir}/${dir}${R1}"
-	my_array["${strain}_R2"]="${basedir}/${dir}${R2}"
-
 	# Run FASTQC
 	fastqc.sh -f $R1 -r $R2
 
