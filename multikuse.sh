@@ -36,6 +36,8 @@ do
 	if [ ${#check[@]} -gt 0 ]; then
 		R1=($(find -name "*1P.fastq.gz"))
 		R2=($(find -name "*2P.fastq.gz"))
+	else
+		R2="${R1/R1/R2}"
 	fi
 
 	# Run FASTQC
