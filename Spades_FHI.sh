@@ -24,10 +24,10 @@ do
 	# Get strain name
 	strain=${PWD##*/}
 	# Find R1 and R2, get results into an array
-	R1=($(find -name "*R1*" | sort ))
+	R1=($(find -name "*R1*fastq.gz" | sort ))
 	# If more than 1 R1 in dir, (NextSeq reads), merge reads together
 	# However, if merged reads already exists, skip this step
-	R1merged=($(find -name "*merged*"))
+	R1merged=($(find -name "*merged*fastq.gz"))
 	if [ ${#R1[@]} -gt 1 ] && [ ${#R1merged[@]} -eq 0 ]; then		
 		Rlen=${#R1[@]}
 		echo "Merging ${Rlen} read files in ${strain}"
