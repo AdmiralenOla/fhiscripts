@@ -4,7 +4,7 @@
 
 # USAGE: Trim_and_assemble.sh
 
-VERSION="1.2"
+VERSION="1.3"
 
 basedir=$(pwd)
 runname=${basedir##*/}
@@ -56,18 +56,6 @@ do
 	my_array["${strain}_R1"]="${basedir}/${dir}${newR1}"
 	my_array["${strain}_R2"]="${basedir}/${dir}${newR2}"
 
-	# Run FASTQC
-	fastqc.sh -f $newR1 -r $newR2
-
-	# Run kraken on samples
-	echo "Running Kraken on strain ${strain}"
-	if ! test -f ${strain}.kraken; then
-		kraken --db "$KRAKENDB" --threads 4 --fastq-input --gzip-compressed --paired --output ${strain}.kraken --preload $newR1 $newR2
-	fi
-	# Kraken-report
-	if ! test -f ${strain}.strainreport; then
-		kraken-report --db "$KRAKENDB" ${strain}.kraken > ${strain}.strainreport
-	fi
 	# Run spades unless fasta file already exists in Spades_assembly OR dir Output exists in current folder
 	echo "Running Spades on strain ${strain}"
 	if ! ( [ -f Output ] || [ -f ${basedir}/Spades_assembly/${strain}.fasta ] ); then
@@ -168,7 +156,6 @@ if ! test -d "Kraken"; then
 	mkdir "Kraken"
 fi
 kraken --db "$KRAKENDB" --threads 4 --fasta-input --output Kraken/All_contigs.kraken --preload *.fasta
-#kraken2 --db "$KRAKENDB" --threads 4 --report Kraken/All_contigs.krakenreport --use-names --output Kraken/All_contigs.kraken *.fasta # MOVE BACK TO KRAKEN1
 kraken-report --db "$KRAKENDB" Kraken/All_contigs.kraken > Kraken/All_contigs.krakenreport
 kraken-translate --db "$KRAKENDB" Kraken/All_contigs.kraken > Kraken/All_contigs.krakentranslate
 rm Kraken/All_contigs.kraken
@@ -197,15 +184,6 @@ done
 echo "VERSION=${VERSION}" >> "${spades_output_dir}/Spades_FHI_RUNINFO.txt"
 echo "DATE=$(date)" >> "${spades_output_dir}/Spades_FHI_RUNINFO.txt"
 
-# Run multiqc
-cd "$basedir"
-all_strains=$(ls -d */)
-delete=("Spades_assembly/" "QC/")
-for del in ${delete[@]}
-do
-	all_strains="${all_strains[@]/$del}"
-done
-multiqc.sh 
 
 # REMOVE ALL UNNECESSARY FILES
 
