@@ -10,9 +10,6 @@ basedir=$(pwd)
 runname=${basedir##*/}
 KRAKENDB="/opt/minikraken/minikraken"
 
-# Version 1.2 - Array to hold overview of files for each strain
-declare -A my_array
-
 for dir in $(ls -d */)
 do
 	# Skip dir if name equal to Spades_assembly
