@@ -59,7 +59,7 @@ do
 	# Run spades unless fasta file already exists in Spades_assembly OR dir Output exists in current folder
 	echo "Running Spades on strain ${strain}"
 	if ! ( [ -f Output ] || [ -f ${basedir}/Spades_assembly/${strain}.fasta ] ); then
-		spades.py -o Output --careful --cov-cutoff auto -t 4 -1 ${newR1[0]} -2 ${newR2[0]}
+		spades.py -o Output --careful --isolate --cov-cutoff auto -t 4 -1 ${newR1[0]} -2 ${newR2[0]}
 	fi
 
 	cd "${basedir}"
