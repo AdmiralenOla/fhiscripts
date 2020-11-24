@@ -18,8 +18,22 @@ from Bio.Blast import NCBIXML
 from pkg_resources import resource_string, resource_filename
 #from .__init__ import __version__
 import argparse, time, os, sys
-__version__ = '0.2b'
+__version__ = '0.3b'
 
+class Range(object):
+    def __init__(self, start, end):
+        self.start = start
+        self.end = end
+
+    def __eq__(self, other):
+        return self.start <= other <= self.end
+
+    def __contains__(self, item):
+        return self.__eq__(item)
+
+    def __iter__(self):
+        yield self
+        
 def rev_comp(seq):
     """Returns the reverse complement of a given sequence"""
     function = {"A":"T", "T":"A", "C":"G", "G":"C"}
@@ -115,8 +129,8 @@ def main():
     parser.add_argument("--query", help="Query FASTA file to BLAST for")
     parser.add_argument("fastaFile", help="Subject FASTA file to BLAST against")
     parser.add_argument("--outfile", help="Name of file to write masked FASTA to")
-    parser.add_argument("--minlength", help="Minimum length of hit to mask. Default=100",default=100)
-    parser.add_argument("--minidentity", help="Minimum percent identity to query to mask, over length of hit. Default=0.9",default=0.9)
+    parser.add_argument("--minlength", help="Minimum length of hit to mask. Default=100",default=100,type=int)
+    parser.add_argument("--minidentity", help="Minimum percent identity to query to mask, over length of hit. Default=0.9",default=0.9,type=float,choices=Range(0.0,1.0))
     args = parser.parse_args()
     if args.outfile is None:
         args.outfile = args.fastaFile + ".masked.fasta"
@@ -125,7 +139,7 @@ def main():
 
     input_fasta = read_FASTA_Bio(args.fastaFile)
     #input_fasta = read_FASTA(args.fastaFile)
-    if len(hits) == 1 and hits['title'][0] == "None":
+    if len(hits) == 1 and hits[0]['title'] == "None":
         print("Unable to find any trace of the GGI island")
         writeFile(input_fasta,args.outfile)
     else:
