@@ -18,7 +18,7 @@ from Bio.Blast import NCBIXML
 from pkg_resources import resource_string, resource_filename
 #from .__init__ import __version__
 import argparse, time, os, sys
-__version__ = '0.1b'
+__version__ = '0.2b'
 
 def rev_comp(seq):
     """Returns the reverse complement of a given sequence"""
@@ -70,20 +70,25 @@ def read_FASTA(f):
     print ("DONE!")
     return seqDict
 
-def find_island(seq, db):
-    """Find the location of the dnaA gene and return the coordinates"""
+def find_island(seq, db, minlength, minperc):
+    """Find the location of GGI and return the coordinates. Allow multiple hits"""
     blastn_cline = NcbiblastnCommandline(query=seq, subject=db, outfmt=5, out='GGI.xml')
     print("Running BLAST...")
     blastn_cline()
     blast_record = NCBIXML.parse(open('GGI.xml'))
-    hits = {'title': 'None', 'score': 0.0, 'identities': 0, 'frame':(0,0), 'gaps':0, 'positives':0, 'length':0, 'subject_start':0, 'subject_end': 0,'frame':(0,0)}
-    highscore = 0.0
+    hits = []
+    nohit = {'title': 'None', 'score': 0.0, 'identities': 0, 'frame':(0,0), 'gaps':0, 'positives':0, 'length':0, 'subject_start':0, 'subject_end': 0,'frame':(0,0)}
+    hits.append(nohit)
+    #highscore = 0.0
+    # Min-length = 
     for Blast in blast_record:
         for al in Blast.alignments:
             for hsp in al.hsps:
-                if hsp.score > highscore:
-                    hits = {'title': al.hit_id, 'score': hsp.score, 'identities': hsp.identities, 'frame':hsp.frame, 'gaps':hsp.gaps, 'positives':hsp.positives, 'length':hsp.align_length, 'subject_start':hsp.sbjct_start,'subject_end': hsp.sbjct_end,'frame':hsp.frame}
-                    highscore = hsp.score
+                if hsp.align_length >= minlength:
+                    percid = hsp.identities / hsp.align_length
+                    if percid >= minperc:
+                        hit = {'title': al.hit_id, 'score': hsp.score, 'identities': hsp.identities, 'frame':hsp.frame, 'gaps':hsp.gaps, 'positives':hsp.positives, 'length':hsp.align_length, 'subject_start':hsp.sbjct_start,'subject_end': hsp.sbjct_end,'frame':hsp.frame}
+                        hits.append(hit)
                     
     return hits
 
@@ -110,28 +115,32 @@ def main():
     parser.add_argument("--query", help="Query FASTA file to BLAST for")
     parser.add_argument("fastaFile", help="Subject FASTA file to BLAST against")
     parser.add_argument("--outfile", help="Name of file to write masked FASTA to")
+    parser.add_argument("--minlength", help="Minimum length of hit to mask. Default=100",default=100)
+    parser.add_argument("--minidentity", help="Minimum percent identity to query to mask, over length of hit. Default=0.9",default=0.9)
     args = parser.parse_args()
     if args.outfile is None:
         args.outfile = args.fastaFile + ".masked.fasta"
 
-    hits = find_island(args.query, args.fastaFile)
+    hits = find_island(args.query, args.fastaFile, args.minlength, args.minidentity)
 
     input_fasta = read_FASTA_Bio(args.fastaFile)
     #input_fasta = read_FASTA(args.fastaFile)
-    if hits['title'] == "None":
+    if len(hits) == 1 and hits['title'][0] == "None":
         print("Unable to find any trace of the GGI island")
+        writeFile(input_fasta,args.outfile)
     else:
         # MASK SEQUENCE
-        if hits['frame'] == (1,1):
-            masked_fasta = mask_seq(input_fasta, hits['subject_start'], hits['subject_end'], hits['title'], hits['length'])
-            writeFile(masked_fasta, args.outfile)
-        elif hits['frame'] == (1,-1):
-            masked_fasta = mask_seq(input_fasta, hits['subject_end'] + hits['subject_start'],hits['title'], hits['length'])
-            #revseq = rev_comp_Bio(rotated_fasta)
-            #print(hits)
-            writeFile(masked_fasta, args.outfile)
-        else:
-            print("Something wrong with frame. Contact Ola")
+        masked_fasta = input_fasta
+        for hit in hits[1:]:
+            if hit['frame'] == (1,1):
+                masked_fasta = mask_seq(masked_fasta, hit['subject_start'], hit['subject_end'], hit['title'], hit['length'])
+            elif hit['frame'] == (1,-1):
+                masked_fasta = mask_seq(masked_fasta, hit['subject_end'], hit['subject_start'], hit['title'], hit['length'])
+            else:
+                print("Something wrong with frame. Contact Ola")
+                sys.exit(-1)
+        writeFile(masked_fasta, args.outfile)
+
 
 if __name__ == '__main__':
     main()
