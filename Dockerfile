@@ -33,6 +33,11 @@ RUN mamba create -n coverage coverm
 # Set up environment for QC
 RUN mamba create -n qc fastqc multiqc
 
+# REMEMBER TO PULL LATEST CHANGES FROM GIT REPOSITORY
+RUN cp -r *.py /usr/bin
+RUN cp -r *.sh /usr/bin
+RUN cp -r *.R /usr/bin
+
 WORKDIR /mnt
 RUN useradd -ms /bin/bash -g sudo scrub
 USER scrub
